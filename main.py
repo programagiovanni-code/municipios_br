@@ -10,7 +10,6 @@ def extrair_dicionario_ibge():
     
     print("Conectando à API do IBGE...")
     try:
-        # O timeout garante que o script não trave se o servidor não responder
         response = requests.get(url, timeout=15)
         response.raise_for_status() 
         
@@ -52,7 +51,6 @@ def limpar_texto_gabarito(df_gabarito):
     for col in colunas_texto:
         df_gabarito[col] = df_gabarito[col].astype(str).str.upper().str.strip().str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
 
-    # CORREÇÃO AQUI: Usa o df_gabarito local em vez de chamar a API novamente
     mascara_boa = df_gabarito['Municipios'] == 'BOA ESPERANCA DO NORTE'
     if mascara_boa.any():
         df_gabarito.loc[mascara_boa, 'Região'] = 'CENTRO OESTE'
@@ -84,11 +82,10 @@ def salvando(df_gabarito):
     print("Arquivo criado!")
 
 #------------------------------------------------------------
-# Bloco de execução principal (Blindado contra importações)
 if __name__ == "__main__":
     df_final = extrair_dicionario_ibge()
     
-    # Só continua se a extração (API) não retornou erro
+
     if df_final is not None:
         df_save = limpar_texto_gabarito(df_final)
         salvando(df_save)
